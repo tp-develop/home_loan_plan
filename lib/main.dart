@@ -1,8 +1,16 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_loan_plan/constance/AppConstance.dart';
+import 'package:home_loan_plan/models/dto/staff.dto.dart';
 import 'package:home_loan_plan/models/plan.dart';
+import 'package:home_loan_plan/provider/auth/auth_notifier.dart';
+import 'package:home_loan_plan/provider/auth/hive_db_auth_repository.dart';
 import 'package:home_loan_plan/provider/plan/hlp_plan_state_provider.dart';
 import 'package:home_loan_plan/provider/plan/hlp_shared_pref_provider.dart';
 import 'package:home_loan_plan/repository/shared_preference_repository/hlp_shared_preference_repository.dart';
@@ -13,10 +21,40 @@ final planProvider = StateNotifierProvider<HLPPlanStateProvider, List<Plan>>((re
   return HLPPlanStateProvider();
 });
 
+final authNotifierProvider = StateNotifierProvider<AuthNotifier, Staff?>((ref) {
+  return AuthNotifier();
+});
+
+Future<void> loadJsonData(Box box) async {
+  final String data = await rootBundle.loadString('assets/storage/data.db.json');
+  final dynamic jsonsData = json.decode(data);
+
+  // log(jsonsData.toString(), name: 'loadJsonData');
+  for (var jsonData in jsonsData['staff']) {
+    final staff = Staff(
+      firstName: jsonData['firstName'],
+      id: jsonData['id'],
+      branchId: jsonData['branchId'],
+      username: jsonData['username'],
+      lastName: jsonData['lastName'],
+      password: jsonData['password'],
+      personalId: jsonData['personalId'],
+    );
+
+    box.put(staff.username, staff);
+  }
+}
+
 Future<void> main() async {
+  await Hive.initFlutter();
+  Hive.registerAdapter(StaffAdapter());
+
+  final staffBox = await Hive.openBox('staff');
+
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
+  await loadJsonData(staffBox);
   // await SystemChrome.setPreferredOrientations(
   //   Device.get().isTablet
   //       ? [
@@ -31,6 +69,12 @@ Future<void> main() async {
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
+  final user = staffBox.values.toList();
+
+  log('user ${user.map((e) => e.id).toString()}');
+
+  HiveDBAuthRepository authRepository = await HiveDBAuthRepository(boxCollection: [staffBox]);
+
   runApp(
     EasyLocalization(
       supportedLocales: const [
@@ -44,7 +88,8 @@ Future<void> main() async {
         overrides: [
           sharedPreferenceRepositoryProvider.overrideWithValue(
             HLPSharedPreferenceRepository(prefs),
-          )
+          ),
+          authRepositoryProvider.overrideWithValue(authRepository)
         ],
         child: HomeLoanPlanApp(),
       ),

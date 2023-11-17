@@ -43,10 +43,16 @@ dependencies:
   uuid: ^4.2.1
   flutter_slidable: ^3.0.1
   adaptive_scrollbar: ^2.1.2
+  hive: ^2.2.3
+  hive_flutter: any
+  path_provider: ^2.0.15
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  hive_generator: ^1.1.2
+  build_runner: ^2.1.10
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -69,6 +75,7 @@ flutter:
   assets:
     - assets/locales/
     - assets/images/
+    - assets/storage/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
