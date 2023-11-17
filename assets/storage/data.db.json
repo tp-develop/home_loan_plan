@@ -1,0 +1,22 @@
+{
+  "staff": [
+    {
+      "id": "9390",
+      "branchId": "001",
+      "firstName": "taloengrat",
+      "lastName": "poomchaiya",
+      "personalId": "1439900304548",
+      "password": "Armtp1997",
+      "username": "taloengrat.p"
+    },
+    {
+      "id": "9390",
+      "branchId": "002",
+      "firstName": "taloengrat2",
+      "lastName": "poomchaiya2",
+      "personalId": "1439900304548",
+      "password": "Armtp1997",
+      "username": "taloengrat.p2"
+    }
+  ]
+}
