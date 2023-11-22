@@ -38,6 +38,7 @@ dependencies:
   flutter_device_type: ^0.4.0
   shared_preferences: ^2.2.2
   intl: any
+  rive: any
   flutter_riverpod: ^2.4.6
   hooks_riverpod: ^2.0.0
   uuid: ^4.2.1
