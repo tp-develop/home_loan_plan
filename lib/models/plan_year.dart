@@ -19,12 +19,12 @@ class PlanYear {
   }) {
     return PlanYear(
       periodNo: periodNo ?? this.periodNo,
-      planMonthList: planMonthList ?? this.planMonthList,
+      planMonthList: planMonthList ?? List.from(this.planMonthList.map((e) => e.copyWith())),
     );
   }
 
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{
+    return {
       'periodNo': periodNo,
       'planMonthList': planMonthList.map((x) => x.toMap()).toList(),
     };
@@ -32,27 +32,23 @@ class PlanYear {
 
   factory PlanYear.fromMap(Map<String, dynamic> map) {
     return PlanYear(
-      periodNo: map['periodNo'] as int,
-      planMonthList: List<PlanMonth>.from(
-        (map['planMonthList'] as List<dynamic>).map<PlanMonth>(
-          (x) => PlanMonth.fromMap(x as Map<String, dynamic>),
-        ),
-      ),
+      periodNo: map['periodNo']?.toInt() ?? 0,
+      planMonthList: List<PlanMonth>.from(map['planMonthList']?.map((x) => PlanMonth.fromMap(x)) ?? const []),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory PlanYear.fromJson(String source) => PlanYear.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory PlanYear.fromJson(String source) => PlanYear.fromMap(json.decode(source));
 
   @override
   String toString() => 'PlanYear(periodNo: $periodNo, planMonthList: $planMonthList)';
 
   @override
-  bool operator ==(covariant PlanYear other) {
+  bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other.periodNo == periodNo && listEquals(other.planMonthList, planMonthList);
+    return other is PlanYear && other.periodNo == periodNo && listEquals(other.planMonthList, planMonthList);
   }
 
   @override

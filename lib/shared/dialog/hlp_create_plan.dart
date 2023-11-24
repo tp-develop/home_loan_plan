@@ -11,7 +11,8 @@ class HLPCreatePlanDialog {
     String name = '';
     double totalLoanAmount = 0;
     double averageInterest = 0;
-    int periodInstallment = 0;
+    double periodInstallment = 0;
+    double averageInstallment = 0;
 
     return showDialog<Plan>(
       context: context,
@@ -45,7 +46,6 @@ class HLPCreatePlanDialog {
                                   ),
                                 ),
                                 HLPTextField(
-                                  context,
                                   margin: EdgeInsets.only(top: 24),
                                   labelText: 'Name'.tr(),
                                   validator: (value) {
@@ -59,7 +59,6 @@ class HLPCreatePlanDialog {
                                   },
                                 ),
                                 HLPTextField(
-                                  context,
                                   margin: EdgeInsets.only(top: 12),
                                   labelText: 'Total loan amount'.tr(),
                                   validator: (value) {
@@ -77,7 +76,6 @@ class HLPCreatePlanDialog {
                                   ],
                                 ),
                                 HLPTextField(
-                                  context,
                                   margin: EdgeInsets.only(top: 12),
                                   labelText: 'Average interest (%)'.tr(),
                                   validator: (value) {
@@ -95,7 +93,6 @@ class HLPCreatePlanDialog {
                                   ],
                                 ),
                                 HLPTextField(
-                                  context,
                                   margin: EdgeInsets.only(top: 12),
                                   labelText: 'Period installments (total month)'.tr(),
                                   validator: (value) {
@@ -106,7 +103,21 @@ class HLPCreatePlanDialog {
                                   },
                                   textInputType: TextInputType.number,
                                   onChanged: (value) {
-                                    periodInstallment = int.parse(value);
+                                    periodInstallment = double.parse(value);
+                                  },
+                                ),
+                                HLPTextField(
+                                  margin: EdgeInsets.only(top: 12),
+                                  labelText: 'Average installments'.tr(),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter some text';
+                                    }
+                                    return null;
+                                  },
+                                  textInputType: TextInputType.number,
+                                  onChanged: (value) {
+                                    averageInstallment = double.parse(value);
                                   },
                                 ),
                               ],
@@ -149,6 +160,7 @@ class HLPCreatePlanDialog {
                                           totalPrice: totalLoanAmount,
                                           periodInstallment: periodInstallment,
                                           planYearList: [],
+                                          averageInstallment: averageInstallment,
                                         ),
                                       ),
                                     ),

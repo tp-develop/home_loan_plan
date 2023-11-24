@@ -5,6 +5,8 @@ abstract class SharedPreferenceRepository {
 
   Future<bool> savePlanToPref(Plan plan);
 
+  Future<bool> updatePlanToPref(Plan plan);
+
   Future<bool> savePlanListToPref(List<Plan> planList);
 
   Future<bool> deleteAll();

@@ -2,13 +2,13 @@
 import 'dart:convert';
 
 class PlanMonth {
-  final int periodNo;
-  final double totalPrice;
-  final double installmentPrice;
-  final double interestPercent;
-  final double interestPrice;
-  final double deductionOfPrincipalPrice;
-  final double outstandingDebtBalance;
+  int periodNo;
+  double totalPrice;
+  double installmentPrice;
+  double interestPercent;
+  double interestPrice;
+  double deductionOfPrincipalPrice;
+  double outstandingDebtBalance;
 
   PlanMonth({
     required this.periodNo,

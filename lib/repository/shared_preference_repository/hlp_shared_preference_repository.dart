@@ -48,7 +48,7 @@ class HLPSharedPreferenceRepository extends SharedPreferenceRepository {
     planList.removeWhere((element) => element.id == id);
     final deleteResult = await deleteAll();
 
-    log('after $planList');
+    // log('after $planList');
     if (deleteResult) {
       List<String> jsonList = planList.map((obj) => jsonEncode(obj.toJson())).toList();
 
@@ -61,6 +61,23 @@ class HLPSharedPreferenceRepository extends SharedPreferenceRepository {
   @override
   Future<bool> savePlanListToPref(List<Plan> planList) {
     // TODO: implement savePlanListToPref
+    planList.map((obj) => jsonEncode(obj.toJson())).toList();
     throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> updatePlanToPref(Plan plan) async {
+    // TODO: implement updatePlanToPref
+    List<Plan> planList = getPlanList();
+
+    List<String> jsonList = planList.map((obj) {
+      if (plan.id == obj.id) {
+        return jsonEncode(plan.toJson());
+      }
+
+      return jsonEncode(obj.toJson());
+    }).toList();
+
+    return await prefs.setStringList(SharedPrefConstance.PLANS, jsonList);
   }
 }

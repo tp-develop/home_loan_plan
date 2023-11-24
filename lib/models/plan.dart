@@ -1,8 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
-import 'dart:developer';
 
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:home_loan_plan/models/plan_year.dart';
@@ -11,9 +9,11 @@ class Plan {
   final String id;
   final String name;
   final double totalPrice;
-  final int periodInstallment;
+  final double periodInstallment;
   final double averageInterest;
   final List<PlanYear> planYearList;
+  final double averageInstallment;
+
   Plan({
     required this.id,
     required this.name,
@@ -21,13 +21,14 @@ class Plan {
     required this.periodInstallment,
     required this.averageInterest,
     required this.planYearList,
+    required this.averageInstallment,
   });
 
   Plan copyWith({
     String? id,
     String? name,
     double? totalPrice,
-    int? periodInstallment,
+    double? periodInstallment,
     double? averageInterest,
     List<PlanYear>? planYearList,
   }) {
@@ -37,12 +38,13 @@ class Plan {
       totalPrice: totalPrice ?? this.totalPrice,
       periodInstallment: periodInstallment ?? this.periodInstallment,
       averageInterest: averageInterest ?? this.averageInterest,
-      planYearList: planYearList ?? this.planYearList,
+      planYearList: planYearList ?? List.from(this.planYearList.map((e) => e.copyWith())),
+      averageInstallment: averageInterest ?? this.averageInterest,
     );
   }
 
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{
+    return {
       'id': id,
       'name': name,
       'totalPrice': totalPrice,
@@ -54,22 +56,19 @@ class Plan {
 
   factory Plan.fromMap(Map<String, dynamic> map) {
     return Plan(
-      id: map['id'] as String,
-      name: map['name'] as String,
-      totalPrice: map['totalPrice'] as double,
-      periodInstallment: map['periodInstallment'] as int,
-      averageInterest: map['averageInterest'] as double,
-      planYearList: List<PlanYear>.from(
-        (map['planYearList'] as List<dynamic>).map<PlanYear>(
-          (x) => PlanYear.fromMap(x as Map<String, dynamic>),
-        ),
-      ),
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      totalPrice: map['totalPrice']?.toDouble() ?? 0.0,
+      periodInstallment: map['periodInstallment']?.toDouble() ?? 0,
+      averageInterest: map['averageInterest']?.toDouble() ?? 0.0,
+      planYearList: List<PlanYear>.from(map['planYearList']?.map((x) => PlanYear.fromMap(x)) ?? const []),
+      averageInstallment: map['averageInstallment']?.toDouble() ?? 0.0,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Plan.fromJson(String source) => Plan.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Plan.fromJson(String source) => Plan.fromMap(json.decode(source));
 
   @override
   String toString() {
@@ -77,10 +76,11 @@ class Plan {
   }
 
   @override
-  bool operator ==(covariant Plan other) {
+  bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other.id == id &&
+    return other is Plan &&
+        other.id == id &&
         other.name == name &&
         other.totalPrice == totalPrice &&
         other.periodInstallment == periodInstallment &&

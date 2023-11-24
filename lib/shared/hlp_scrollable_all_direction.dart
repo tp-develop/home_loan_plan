@@ -40,21 +40,8 @@ class _HlpScrollableAllDirectionState extends State<HlpScrollableAllDirection> {
             controller: horizontalScroll,
             scrollDirection: Axis.horizontal,
             child: Container(
-              // width: 3000,
               child: Container(
                 child: widget.child,
-                // ListView.builder(
-                //   padding: EdgeInsets.only(bottom: width),
-                //   controller: verticalScroll,
-                //   itemCount: 100,
-                //   itemBuilder: (context, index) {
-                //     return Container(
-                //       height: 30,
-                //       color: Colors.lightBlueAccent,
-                //       child: Text("Line " + index.toString()),
-                //     );
-                //   },
-                // ),
               ),
             ),
           ),

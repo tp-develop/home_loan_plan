@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +29,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    log('plans ${ref.planList}', name: this.runtimeType.toString());
+    // log('plans ${ref.planList}', name: this.runtimeType.toString());
 
     return Scaffold(
       appBar: AppBar(
@@ -109,9 +107,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   onCreatePlan() async {
     final resultInfo = await HLPCreatePlanDialog.onShow(context);
 
-    log(resultInfo.toString());
+    // log(resultInfo.toString());
     if (resultInfo != null) {
-      final resultPlanCreate = await ref.createPlan(resultInfo, 20000);
+      final resultPlanCreate = await ref.createPlan(resultInfo, resultInfo.averageInstallment);
 
       if (resultPlanCreate != null) {
         onNavigateToPlanDetail(resultPlanCreate);
@@ -119,8 +117,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
-  void onNavigateToPlanDetail(Plan plan) {
-    Navigator.push(
+  void onNavigateToPlanDetail(Plan plan) async {
+    final resultEdit = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => PlanDetailPage(
@@ -128,5 +126,14 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
       ),
     );
+
+    // log('resultEdit: $resultEdit');
+    if (resultEdit != null && resultEdit is Plan) {
+      final updateResult = await ref.updatePlan(resultEdit);
+
+      if (updateResult) {
+        ref.fetchPlanList();
+      }
+    }
   }
 }

@@ -36,9 +36,9 @@ extension PlanExtenstion on WidgetRef {
   }
 
   Future<Plan?> createPlan(Plan plan, double installmentPermonth) async {
-    Plan planCalculated = _calculatePlan(plan, installmentPermonth);
+    Plan planCalculated = calculatePlan(plan, installmentPermonth: installmentPermonth);
 
-    log(planCalculated.toString(), name: 'createPlan');
+    // log(planCalculated.toString(), name: 'createPlan');
     final saveResult = await read(repositoryProvider).sharedPreferenceRepository.savePlanToPref(planCalculated);
 
     final planList = read(repositoryProvider).sharedPreferenceRepository.getPlanList();
@@ -50,7 +50,13 @@ extension PlanExtenstion on WidgetRef {
     return planCalculated;
   }
 
-  Plan _calculatePlan(Plan plan, double installmentPermonth) {
+  Future<bool> updatePlan(Plan plan) async {
+    final saveResult = await read(repositoryProvider).sharedPreferenceRepository.updatePlanToPref(plan);
+
+    return saveResult;
+  }
+
+  Plan calculatePlan(Plan plan, {double? installmentPermonth}) {
     double totalPrice = plan.totalPrice;
     int totalYear = (plan.periodInstallment / 12).ceil();
 
@@ -72,11 +78,13 @@ extension PlanExtenstion on WidgetRef {
           PlanMonth(
             periodNo: j + 1,
             totalPrice: lastBalance,
-            installmentPrice: installmentPermonth,
+            installmentPrice: installmentPermonth ?? plan.planYearList[i].planMonthList[j].installmentPrice,
             interestPercent: plan.averageInterest,
             interestPrice: interestPerMonth,
-            deductionOfPrincipalPrice: installmentPermonth - interestPerMonth,
-            outstandingDebtBalance: lastBalance - (installmentPermonth - interestPerMonth),
+            deductionOfPrincipalPrice:
+                (installmentPermonth ?? plan.planYearList[i].planMonthList[j].installmentPrice) - interestPerMonth,
+            outstandingDebtBalance: lastBalance -
+                ((installmentPermonth ?? plan.planYearList[i].planMonthList[j].installmentPrice) - interestPerMonth),
           ),
         );
       }
@@ -84,6 +92,44 @@ extension PlanExtenstion on WidgetRef {
         periodNo: i + 1,
         planMonthList: planMonthList,
       ));
+    }
+
+    return plan;
+  }
+
+  Plan reCalculatePlan(Plan plan) {
+    int totalYear = (plan.periodInstallment / 12).ceil();
+
+    for (var i = 0; i < totalYear; i++) {
+      List<PlanMonth> planMonthList = [];
+
+      for (var j = 0; j < 12; j++) {
+        double lastBalance = i == 0
+            ? j == 0
+                ? plan.totalPrice
+                : planMonthList[j - 1].outstandingDebtBalance
+            : j == 0
+                ? plan.planYearList[i - 1].planMonthList[11].outstandingDebtBalance
+                : planMonthList[j - 1].outstandingDebtBalance;
+
+        double interestPerMonth = lastBalance * (plan.averageInterest / 100) / 12;
+        double installmentPrice = plan.planYearList[i].planMonthList[j].installmentPrice;
+        planMonthList.add(
+          PlanMonth(
+            periodNo: j + 1,
+            totalPrice: lastBalance,
+            installmentPrice: installmentPrice,
+            interestPercent: plan.averageInterest,
+            interestPrice: interestPerMonth,
+            deductionOfPrincipalPrice: installmentPrice - interestPerMonth,
+            outstandingDebtBalance: lastBalance - (installmentPrice - interestPerMonth),
+          ),
+        );
+      }
+      plan.planYearList[i] = PlanYear(
+        periodNo: i + 1,
+        planMonthList: planMonthList,
+      );
     }
 
     return plan;
